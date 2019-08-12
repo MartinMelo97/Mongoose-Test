@@ -64,6 +64,24 @@ class UserController {
             })
     }
 
+    patchUser(id, body) {
+        return User.findByIdAndUpdate(id, body, {
+            new: true
+        })
+            .then(user => {
+                return {
+                    message: 'ok',
+                    user
+                }
+            })
+            .catch(error => {
+                return {
+                    hasError: true,
+                    error
+                }
+            })
+    }
+
     //soft Delete
     deleteUser(id) {
         const now = moment().format('YYYY-MM-DD hh:mm:ss')

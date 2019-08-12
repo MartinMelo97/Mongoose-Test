@@ -57,6 +57,19 @@ router.put('/:id', (req, res) => {
         })
 })
 
+router.patch('/:id', (req, res) => {
+    const { params, body } = req
+    userController.patchUser(params.id, body)
+        .then(result => {
+            if (result.hasError)
+                res.status(400).json(result.error)
+            res.json(result)
+        })
+        .catch(error => {
+            res.status(400).json(error)
+        })
+})
+
 router.delete('/:id', (req, res) => {
     userController.deleteUser(req.params.id)
         .then(result => {
