@@ -1,10 +1,16 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const passport = require('passport')
 const http = require('http')
-
+require('dotenv').config()
 // Connecting to mongo db
+
+const port = process.env.PORT || 5000
+const dbUrl = process.env.DB_URL || 'localhost:27017'
+const dbCollection = process.env.DB_COLLECTION || 'test_locall'
+
 mongoose.connect(
-    'mongodb://localhost:27017/test_local',
+    `mongodb://${dbUrl}/${dbCollection}`,
     { useNewUrlParser: true, useFindAndModify: false }
 )
     .then(connection => {
@@ -16,14 +22,13 @@ mongoose.connect(
 
 const app = express()
 app.use(express.json())
-
+app.use(express.urlencoded({ extended: false }))
+app.use(passport.initialize())
 //Routes
 const userRoutes = require('./routes/userRouter')
 app.use('/users', userRoutes)
 
 const server = http.createServer(app)
-const PORT = 5000
-
-server.listen(PORT, () => {
-    console.log(`App running in port ${PORT}`)
+server.listen(port, () => {
+    console.log(`App running in port ${port}`)
 })
