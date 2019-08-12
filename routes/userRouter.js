@@ -7,35 +7,32 @@ const userController = require('../controllers/UserController')
 //List Users
 router.get('/', (req, res) => {
     userController.findUsers()
-    .then(users => {
-        res.json(users)
-    })
+        .then(users => {
+            res.json(users)
+        })
+        .catch(error => {
+            res.status(400).json(error)
+        })
 })
 
 //Create user
 router.post('/', (req, res) => {
     const data = req.body
-    const newUser = new User(data)
-    newUser.save()
-        .then(user => {
-            console.log(user)
-            res.json({ message: 'ok' })
+    userController.createUser(data)
+        .then(response => {
+            if(response.hasError) {
+                res.status(400).json(response.error)
+            }
+            res.json(response)
         })
         .catch(error => {
-            console.log(error)
             res.status(400).json(error)
         })
 })
 
 //Find One User
-router.get('/:value', (req, res) => {
-    let request = null
-    if(req.query.attr) {
-        request = userController.findOneUser(req.params.value, req.query.attr)
-    } else {
-        request = userController.findOneUser(req.params.value)
-    }
-    request
+router.get('/:id', (req, res) => {
+    userController.findOneUser(req.params.id)
         .then(result => {
             if(result.hasError)
                 return res.status(400).json(result.error)
@@ -48,28 +45,26 @@ router.get('/:value', (req, res) => {
 })
 
 //Update User
-router.put('/:username', (req, res) => {
-    User.findOneAndUpdate({
-        username: req.params.username },
-        req.body,
-        { new: true }
-    )
-        .then(user => {
-            res.json(user)
+router.put('/:id', (req, res) => {
+    const { params, body } = req
+    userController.updateUser(params.id, body)
+        .then(result => {
+            if (result.hasError) {
+                res.status(400).json(result.error)
+            }
+            res.json(result)
         })
         .catch(error => {
             res.status(400).json(error)
         })
 })
 
-router.delete('/:username', (req, res) => {
-    const now = moment().format('YYYY-MM-DD hh:mm:ss')
-    User.updateOne({
-        username: req.params.username },
-        { deletedAt: now }
-    )
-        .then(updated => {
-                res.json({ message: 'ok', updated })
+router.delete('/:id', (req, res) => {
+    userController.deleteUser(req.params.id)
+        .then(result => {
+            if (result.hasError || result.ok === 0)
+                res.status(400).json(result.error)
+            res.json(result)
         })
         .catch(error => {
             res.status(400).json(error)
