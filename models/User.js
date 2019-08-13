@@ -27,6 +27,10 @@ const userSchema = new Schema({
     deletedAt: {
         type: Date,
         required: false
+    },
+    password: {
+        type: String,
+        required: false
     }
 }, {
     timestamps: true
